@@ -1,10 +1,13 @@
 package fr.izio.twilio_programmable_voice;
 
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 
 import com.twilio.voice.LogLevel;
 import com.twilio.voice.Voice;
 
+import fr.izio.twilio_programmable_voice.fcm.MessagingService;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -40,6 +43,9 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         this.twilioProgrammableVoice.setActivity(binding.getActivity());
         this.twilioProgrammableVoice.registerVoiceReceiver();
+
+        Intent service = new Intent(binding.getActivity().getApplicationContext(), MessagingService.class);
+        binding.getActivity().startService(service);
     }
 
     @Override
