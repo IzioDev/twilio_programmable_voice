@@ -4,5 +4,14 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <application>
+        <service
+            android:name=".TwilioFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
 
 </manifest>

@@ -169,6 +169,13 @@ class TwilioProgrammableVoice {
     return microphonePermissionStatus;
   }
 
+  Future<String> getFcmToken() async {
+    if (Platform.isAndroid) {
+      return _methodChannel.invokeMethod('getFcmToken');
+    }
+    return "";
+  }
+
   /// Get the incoming calls stream
   Stream<CallEvent> get callStatusStream {
     CallEvent currentCallEvent;

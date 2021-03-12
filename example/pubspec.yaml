@@ -3,17 +3,17 @@ description: Demonstrates how to use the twilio_programmable_voice plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_apns: ^1.4.1
+  # flutter_apns: ^1.4.1
   #  We might want to remove firebase_messagin in favor of flutter_apns
-  firebase_messaging: 7.0.3
+  # firebase_messaging: 7.0.3
   callkeep: ^0.2.3
 
   flutter_dotenv: ^2.1.0
@@ -21,7 +21,6 @@ dependencies:
   flutter_svg: ^0.19.1
   fluro: ^2.0.3
   flutter_bloc: ^6.1.3
-
 
   twilio_programmable_voice:
     # When depending on this package from a real application you should use:

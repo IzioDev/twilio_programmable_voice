@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
-import 'package:flutter_apns/flutter_apns.dart';
-import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
+// import 'package:flutter_apns/flutter_apns.dart';
+// import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
+import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 import 'box_utils.dart';
 import 'exceptions.dart';
@@ -149,23 +150,6 @@ class TokenService {
   }
 
   Future<String> _firebaseMessagingFcmTokenStrategy() {
-    final connector = createPushConnector();
-    connector.configure(
-      onLaunch: (data) => Future.microtask(() => print(data)),
-      onResume: (data) => Future.microtask(() => print(data)),
-      onMessage: (data) => Future.microtask(() => print(data)),
-      onBackgroundMessage: noopTopLevelFunction,
-    );
-
-    final completer = Completer<String>();
-
-    connector.token.addListener(() {
-      print("[TokenService] deviceToken : $connector.token.value");
-      completer.complete(connector.token.value);
-    });
-
-    connector.requestNotificationPermissions();
-
-    return completer.future;
+    return TwilioProgrammableVoice().getFcmToken();
   }
 }

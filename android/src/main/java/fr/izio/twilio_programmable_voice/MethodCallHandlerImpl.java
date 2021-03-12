@@ -2,6 +2,10 @@ package fr.izio.twilio_programmable_voice;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.twilio.voice.AcceptOptions;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallInvite;
@@ -11,8 +15,8 @@ import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
@@ -21,7 +25,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     static final String REGISTRATION_ERROR_CODE = "1";
     static final String REGISTRATION_ERROR_MESSAGE = "Registration failed";
-    final String TAG = "[TwilioProgrammableVoice - MethodCallHandlerImpl]";
+    final String TAG = "MethodCallHandlerImpl";
 
     public TwilioProgrammableVoice twilioProgrammableVoice;
 
@@ -32,25 +36,58 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
-        if (call.method.equals("registerVoice")) {
-            final String accessToken = call.argument("accessToken");
-            final String fcmToken = call.argument("fcmToken");
-            this.registerVoice(accessToken, fcmToken, result);
-        } else if (call.method.equals("makeCall")) {
-            final String from = call.argument("from");
-            final String to = call.argument("to");
-            final String accessToken = call.argument("accessToken");
-            this.makeCall(from, to, accessToken, result);
-        } else if (call.method.equals("handleMessage")) {
-            final Map<String, String> data = call.argument("messageData");
-            this.handleMessage(data, result);
-        } else if (call.method.equals("answer")) {
-            this.answer(result);
-        } else if (call.method.equals("reject")) {
-            this.reject(result);
-        } else {
-            result.notImplemented();
+        switch (call.method) {
+            case "registerVoice": {
+                final String accessToken = call.argument("accessToken");
+                final String fcmToken = call.argument("fcmToken");
+                this.registerVoice(accessToken, fcmToken, result);
+                break;
+            }
+            case "makeCall": {
+                final String from = call.argument("from");
+                final String to = call.argument("to");
+                final String accessToken = call.argument("accessToken");
+                this.makeCall(from, to, accessToken, result);
+                break;
+            }
+            case "handleMessage":
+                final Map<String, String> data = call.argument("messageData");
+                this.handleMessage(data, result);
+                break;
+            case "answer":
+                this.answer(result);
+                break;
+            case "reject":
+                this.reject(result);
+                break;
+            case "getFcmToken":
+                this.getFcmToken(result);
+                break;
+            default:
+                result.notImplemented();
+                break;
         }
+    }
+
+    private void getFcmToken(MethodChannel.Result result) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            final Exception exception = task.getException();
+                            Log.w(TAG, "Fetching FCM registration token failed", exception);
+                            result.error("FETCH-FCM-ERROR", "FCM registration token failed", exception);
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        Log.d(TAG, "Fcm Token : " + token);
+                        result.success(token);
+                    }
+                });
     }
 
     private void reject(MethodChannel.Result result) {
@@ -93,7 +130,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
 
         if (isValid) {
-            result.success(isValid);
+            result.success(true);
         } else {
             result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
         }
