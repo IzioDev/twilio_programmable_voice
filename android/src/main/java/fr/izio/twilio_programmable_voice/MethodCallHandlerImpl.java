@@ -71,22 +71,19 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
     private void getFcmToken(MethodChannel.Result result) {
         FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            final Exception exception = task.getException();
-                            Log.w(TAG, "Fetching FCM registration token failed", exception);
-                            result.error("FETCH-FCM-ERROR", "FCM registration token failed", exception);
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        Log.d(TAG, "Fcm Token : " + token);
-                        result.success(token);
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        final Exception exception = task.getException();
+                        Log.w(TAG, "Fetching FCM registration token failed", exception);
+                        result.error("FETCH-FCM-ERROR", "FCM registration token failed", exception);
+                        return;
                     }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+
+                    Log.d(TAG, "Fcm Token : " + token);
+                    result.success(token);
                 });
     }
 

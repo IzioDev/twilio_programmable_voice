@@ -1,1 +1,3 @@
 rootProject.name = 'twilio_programmable_voice'
+android.useAndroidX=true
+android.enableJetifier=true
